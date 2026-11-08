@@ -1,36 +1,14 @@
 {% extends 'debates/base.html' %}
 
+{% block title %}สมัครสมาชิก{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center py-4">
-    <div class="col-md-8 col-lg-5">
-        <!-- ส่วนหัว -->
-        <div class="text-center mb-4">
-            <h2 class="fw-bold"><i class="bi bi-person-plus me-2" style="color: #ff7b00;"></i>สมัครสมาชิก</h2>
-            <p class="text-muted">ร่วมโหวตเพื่อแลกเปลี่ยนความคิดเห็น!</p>
-        </div>
-        
-        <!-- ฟอร์มกรอกข้อมูล -->
-        <div class="card shadow-sm border-0" style="background-color: #fcfcfc;">
-            <div class="card-body p-4 p-md-5">
-                <form method="POST">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    
-                    <button type="submit" class="btn btn-orange w-100 mt-3 py-2 fw-bold">
-                        <i class="bi bi-check-circle me-2"></i>ยืนยันการสมัครสมาชิก
-                    </button>
-                </form>
-            </div>
-        </div>
-        
-        <!-- ลิงก์ไปหน้าเข้าสู่ระบบ -->
-        <div class="text-center mt-4">
-            <p class="text-secondary">มีบัญชีอยู่แล้ว? 
-                <a href="{% url 'login' %}" style="color: #ff7b00; font-weight: 500; text-decoration: none;">
-                    เข้าสู่ระบบที่นี่
-                </a>
-            </p>
-        </div>
+<div class="auth-layout">
+    <div class="auth-heading"><span class="brand-mark auth-mark"><i class="bi bi-chat-square-text"></i></span><p class="eyebrow mt-4">เริ่มต้นบทสนทนา</p><h1 class="display-title">สร้างบัญชี</h1><p class="page-subtitle">เข้าร่วมโหวตและแบ่งปันเหตุผลของคุณ</p></div>
+    <div class="surface-card p-4 p-md-5">
+        <form method="POST">{% csrf_token %}{{ form.as_p }}<button type="submit" class="btn btn-primary w-100 mt-2">สมัครสมาชิก</button></form>
     </div>
+    <p class="auth-switch">มีบัญชีอยู่แล้ว <a href="{% url 'login' %}">เข้าสู่ระบบ</a></p>
 </div>
+<style>.auth-layout{max-width:440px;margin:32px auto 0}.auth-heading{margin-bottom:24px}.auth-mark{width:42px;height:42px;border-radius:14px;font-size:18px}.auth-switch{margin:20px 0 0;text-align:center;font-size:14px}</style>
 {% endblock %}

@@ -1,246 +1,120 @@
 {% extends 'debates/base.html' %}
 {% load post_time %}
 
+{% block title %}Topics{% endblock %}
+
 {% block content %}
-<!-- ปรับ CSS ให้มีแถบสีส้มหนาเฉพาะฝั่งซ้าย และเอาเงารอบๆ ออก -->
-<style>
-    .custom-topic-card {
-        border: 1px solid #dee2e6;
-        border-left: 5px solid #ff7b00 !important; /* แถบสีส้มอยู่ฝั่งซ้าย */
-        border-right: 1px solid #dee2e6 !important;
-        border-radius: 8px;
-        background-color: #ffffff;
-        box-shadow: none !important; /* เอาเงารอบๆ ออก */
-    }
-</style>
-
-<!-- ส่วนหัว, ช่องค้นหา, และปุ่มสลับมุมมอง -->
-<div class="row align-items-center pb-3 mb-4 border-bottom border-secondary-subtle">
-    <div class="col-md-3 mb-3 mb-md-0">
-        <h2 class="mb-0 fw-bold">หัวข้อ Topics</h2>
+<section aria-labelledby="page-title">
+    <div class="page-heading d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+        <div>
+            <h1 class="display-title" id="page-title">Topics</h1>
+        </div>
+        <a href="{% url 'create_topic' %}" class="btn btn-primary d-inline-flex align-items-center gap-2 align-self-md-end">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i><span>ตั้งหัวข้อใหม่</span>
+        </a>
     </div>
-    
-    <div class="col-md-9">
-        <div class="d-flex flex-wrap gap-2 justify-content-md-end align-items-center">
-            <!-- ฟอร์มค้นหา -->
-            <form method="GET" action="{% url 'topic_list' %}" class="flex-grow-1" style="max-width: 350px; margin-bottom: 0;">
-                {% if show_all %}
-                    <input type="hidden" name="show_all" value="true">
-                {% endif %}
-                
-                <div class="input-group shadow-sm align-items-stretch">
-                    <span class="input-group-text bg-white border-end-0 d-flex align-items-center">
-                        <i class="bi bi-search" style="color: #ff7b00;"></i>
-                    </span>
-                    <input type="text" name="q" value="{{ search_query|default_if_none:'' }}" class="form-control border-start-0 m-0" placeholder="ค้นหาชื่อกระทู้..." style="box-shadow: none; margin: 0 !important;">
-                    <button class="btn btn-dark px-3 m-0" type="submit" style="margin: 0 !important;">ค้นหา</button>
-                </div>
-            </form>
 
-            <!-- ปุ่มซ่อน/แสดงหัวข้อที่หมดเวลา -->
-            {% if hide_expired %}
-                <a href="?q={{ search_query|default_if_none:'' }}&show_all=true" class="btn btn-secondary shadow-sm text-nowrap" title="แสดงกระทู้ทั้งหมด">
-                    <i class="bi bi-eye"></i> แสดงทั้งหมด
-                </a>
-            {% else %}
-                <a href="?q={{ search_query|default_if_none:'' }}" class="btn btn-outline-secondary shadow-sm text-nowrap" title="ซ่อนกระทู้ที่หมดเวลาแล้ว">
-                    <i class="bi bi-eye-slash"></i> ซ่อนที่หมดเวลา
-                </a>
-            {% endif %}
-
-            <!-- ปุ่มสลับมุมมอง (1 คอลัมน์ / 2 คอลัมน์) -->
-            <div class="btn-group shadow-sm" role="group">
-                <button type="button" class="btn btn-outline-secondary active" id="btn-col-1" onclick="setView(1)" title="แสดงแถวละ 1 หัวข้อ">
-                    <i class="bi bi-list-task"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary" id="btn-col-2" onclick="setView(2)" title="แสดงแถวละ 2 หัวข้อ">
-                    <i class="bi bi-grid-fill"></i>
-                </button>
+    <div class="topic-toolbar d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <form method="GET" action="{% url 'topic_list' %}" class="topic-search">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search" aria-hidden="true"></i></span>
+                {% if show_all %}<input type="hidden" name="show_all" value="true">{% endif %}
+                <input type="search" name="q" value="{{ search_query|default_if_none:'' }}" class="form-control" placeholder="Search" aria-label="Search">
             </div>
-            
-            <!-- ปุ่มตั้งหัวข้อใหม่ -->
-            <a href="{% url 'create_topic' %}" class="btn btn-orange shadow-sm d-flex align-items-center text-nowrap">
-                <i class="bi bi-plus-circle me-1"></i> ตั้งหัวข้อใหม่
-            </a>
+        </form>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="btn-group filter-switch" role="group" aria-label="ตัวกรองหัวข้อ">
+                <a href="?q={{ search_query|urlencode }}" class="btn{% if not show_all %} active{% endif %}"{% if not show_all %} aria-current="page"{% endif %}>หัวข้อที่เปิดอยู่ตอนนี้</a>
+                <a href="?q={{ search_query|urlencode }}&show_all=true" class="btn{% if show_all %} active{% endif %}"{% if show_all %} aria-current="page"{% endif %}>หัวข้อทั้งหมด</a>
+            </div>
+            <div class="btn-group layout-switch" role="group" aria-label="รูปแบบรายการ">
+                <button type="button" class="btn btn-outline-secondary active" id="btn-col-1" onclick="setView(1)" aria-label="แสดงหนึ่งคอลัมน์" title="หนึ่งคอลัมน์"><i class="bi bi-list-ul"></i></button>
+                <button type="button" class="btn btn-outline-secondary" id="btn-col-2" onclick="setView(2)" aria-label="แสดงสองคอลัมน์" title="สองคอลัมน์"><i class="bi bi-grid"></i></button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ส่วนแสดงรายการหัวข้อ -->
-<div class="row" id="topic-container">
-{% for topic in topics %}
-    <div class="col-12 topic-col mb-4">
-        <div class="custom-topic-card h-100 p-4">
-            
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-2 gap-2">
-                <!-- ชื่อหัวข้อและเวลาโพสต์ -->
-                <div class="d-flex flex-wrap align-items-baseline gap-3 order-2 order-md-1" style="min-width: 0;">
-                    <h2 class="mb-0" style="font-size: 1.4rem; overflow-wrap: anywhere;">{{ topic.title }}</h2>
-                    
-                    <span class="text-muted" style="font-size: 13px;">
-                        {% show_post_time topic.created_at %}
-                    </span>
-                </div>
-                
-                <div class="order-1 order-md-2 align-self-start">
+    <div class="row topic-grid" id="topic-container">
+        {% for topic in topics %}
+        <div class="col-12 topic-col">
+            <article class="topic-card">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
+                    <div class="flex-grow-1">
+                        <h2 class="topic-title">{{ topic.title }}</h2>
+                        <time class="topic-time" datetime="{{ topic.created_at|date:'c' }}">{% show_post_time topic.created_at %}</time>
+                    </div>
                     {% if topic.end_date %}
                         {% if topic.is_expired %}
-                            <span class="badge bg-danger rounded-pill px-3 py-2"><i class="bi bi-clock-history me-1"></i> ปิดโหวตแล้ว</span>
+                            <span class="status-chip is-closed"><i class="bi bi-clock-history" aria-hidden="true"></i> ปิดโหวตแล้ว</span>
                         {% else %}
-                            <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-clock me-1"></i> {{ topic.time_left_display }}</span>
+                            <span class="status-chip is-open"><i class="bi bi-clock" aria-hidden="true"></i> {{ topic.time_left_display }}</span>
                         {% endif %}
                     {% else %}
-                        <span class="badge bg-primary rounded-pill px-3 py-2"><i class="bi bi-infinity me-1"></i> เปิดโหวตตลอด</span>
+                        <span class="status-chip"><i class="bi bi-infinity" aria-hidden="true"></i> เปิดโหวตตลอด</span>
                     {% endif %}
                 </div>
-            </div>
 
-            <!-- แสดงชื่อผู้ตั้งหัวข้อ -->
-            <p style="color: gray; font-size: 14px; margin-bottom: 5px;">
-                ตั้งหัวข้อโดย: 
-                {% if topic.is_anonymous %}
-                    <i class="bi bi-incognito text-secondary"></i> {{ topic.created_by.username|slice:":2" }}***
-                {% else %}
-                    {{ topic.created_by.username }}
-                {% endif %}
-            </p>
+                <p class="topic-description">{{ topic.description }}</p>
+                <div class="topic-meta">ตั้งหัวข้อโดย {{ topic.created_by.username }}</div>
+                {% if topic.tags.all %}<div class="d-flex flex-wrap gap-2 mt-3" aria-label="Tags">{% for tag in topic.tags.all %}<span class="status-chip"><i class="bi bi-tag" aria-hidden="true"></i>{{ tag.name }}</span>{% endfor %}</div>{% endif %}
 
-            <!-- แสดงผล Tags -->
-            {% if topic.tags.all %}
-            <div class="d-flex flex-wrap gap-1 mb-3">
-                {% for tag in topic.tags.all %}
-                    <span class="badge rounded-pill bg-light text-secondary border border-secondary">
-                        <i class="bi bi-tag-fill me-1"></i>{{ tag.name }}
-                    </span>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            {% with total_votes=topic.vote_count %}
-                {% if total_votes > 0 %}
-                    <div class="mb-3 px-1">
-                        <div class="d-flex flex-wrap gap-3 mb-1" style="font-size: 13px;">
-                            {% for side in topic.sides.all %}
-                                <span>
-                                    <span style="color: {% if forloop.counter == 1 %}#ff7b00{% elif forloop.counter == 2 %}#6c757d{% elif forloop.counter == 3 %}#0d6efd{% else %}#198754{% endif %};">●</span>
-                                    {{ side.name }} ({{ side.vote_count }})
-                                </span>
-                            {% endfor %}
-                            <span class="text-muted ms-auto">โหวตแล้ว {{ total_votes }} คน</span>
-                        </div>
-                        
-                        <div class="progress" style="height: 10px; border-radius: 5px;">
-                            {% for side in topic.sides.all %}
-                                {% if side.vote_count > 0 %}
-                                <div class="progress-bar" role="progressbar" 
-                                     style="width: {{ side.percentage|stringformat:'.1f' }}%;
-                                            background-color: {% if forloop.counter == 1 %}#ff7b00{% elif forloop.counter == 2 %}#6c757d{% elif forloop.counter == 3 %}#0d6efd{% else %}#198754{% endif %};" 
-                                     aria-valuenow="{{ side.percentage|stringformat:'.1f' }}" aria-valuemin="0" aria-valuemax="100">
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
+                {% with total_votes=topic.vote_count %}
+                    {% if total_votes > 0 %}
+                    <div class="vote-legend">
+                        {% for side in topic.sides.all %}
+                            <span><i class="vote-dot vote-dot-{{ forloop.counter }}"></i>{{ side.name }} <span class="text-muted">{{ side.vote_count }}</span></span>
+                        {% endfor %}
+                        <span class="vote-total">{{ total_votes }} โหวต</span>
                     </div>
-                {% else %}
-                    <p class="text-muted" style="font-size: 13px;"><em>ยังไม่มีผู้ลงคะแนนโหวต</em></p>
-                {% endif %}
-            {% endwith %}
+                    <div class="vote-track" role="img" aria-label="ผลโหวต {{ total_votes }} คน">
+                        {% for side in topic.sides.all %}
+                            {% if side.vote_count > 0 %}<span class="vote-segment vote-segment-{{ forloop.counter }}" style="width: {% widthratio side.vote_count total_votes 100 %}%"></span>{% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="topic-meta mb-0 mt-3">ยังไม่มีผู้ลงคะแนน</p>
+                    {% endif %}
+                {% endwith %}
 
-            <!-- ปุ่มจัดการ -->
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary-subtle">
-                <!-- ฝั่งซ้าย -->
-                <div class="d-flex align-items-center gap-2">
-                    <a href="{% url 'topic_detail' topic.id %}" class="btn btn-outline-orange btn-sm">
-                        <i class="bi bi-chat-text me-1"></i> อ่านและโหวต
-                    </a>
-
+                <div class="topic-actions">
+                    <a href="{% url 'topic_detail' topic.id %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-square-text me-1" aria-hidden="true"></i>{% if topic.is_expired %}ดูผลและความคิดเห็น{% else %}อ่านและโหวต{% endif %}</a>
                     {% if user == topic.created_by %}
-                    <a href="{% url 'edit_topic' topic.id %}" class="btn btn-warning btn-sm text-white">
-                        <i class="bi bi-pencil-square me-1"></i> แก้ไข
-                    </a>
+                        <a href="{% url 'edit_topic' topic.id %}" class="btn btn-outline-secondary btn-sm">แก้ไข</a>
+                        <form action="{% url 'delete_topic' topic.id %}" method="POST" class="m-0" onsubmit="return confirm('แน่ใจหรือไม่ว่าต้องการลบหัวข้อนี้?');">
+                            {% csrf_token %}<button type="submit" class="btn btn-outline-secondary btn-sm">ลบ</button>
+                        </form>
                     {% endif %}
                 </div>
-
-                <!-- ฝั่งขวา (ปุ่มลบ) -->
-                <div>
-                    {% if user == topic.created_by %}
-                    <form action="{% url 'delete_topic' topic.id %}" method="POST" class="m-0"
-                        onsubmit="return confirm('แน่ใจหรือไม่ว่าต้องการลบหัวข้อนี้?');">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash3 me-1"></i> ลบ</button>
-                    </form>
-                    {% endif %}
-                </div>
-            </div>
-
+            </article>
         </div>
+        {% empty %}
+        <div class="col-12"><div class="surface-card p-5 text-center"><h2 class="h4">{% if show_all %}ยังไม่มีหัวข้อ{% else %}ไม่มีหัวข้อที่เปิดอยู่{% endif %}</h2><p class="mb-0">{% if search_query %}ลองค้นหาด้วยคำอื่น{% else %}ตั้งหัวข้อใหม่เพื่อเริ่มบทสนทนา{% endif %}</p></div></div>
+        {% endfor %}
     </div>
-{% empty %}
-    <div class="col-12">
-        <p class="text-center text-muted">ไม่พบหัวข้อ ลองตั้งหัวข้อใหม่หรือเปลี่ยนคำค้นหา</p>
-    </div>
-{% endfor %}
-</div>
 
-{% if page_obj.paginator.num_pages > 1 %}
-<nav aria-label="เปลี่ยนหน้ารายการหัวข้อ" class="d-flex justify-content-center mt-3 mb-4">
-    <ul class="pagination">
-        {% if page_obj.has_previous %}
-        <li class="page-item">
-            <a class="page-link" href="?q={{ search_query|urlencode }}{% if show_all %}&show_all=true{% endif %}&page={{ page_obj.previous_page_number }}">ก่อนหน้า</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled"><span class="page-link">ก่อนหน้า</span></li>
-        {% endif %}
-        
-        <li class="page-item disabled"><span class="page-link">หน้า {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
-        
-        {% if page_obj.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="?q={{ search_query|urlencode }}{% if show_all %}&show_all=true{% endif %}&page={{ page_obj.next_page_number }}">ถัดไป</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled"><span class="page-link">ถัดไป</span></li>
-        {% endif %}
-    </ul>
-</nav>
-{% endif %}
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="เปลี่ยนหน้ารายการหัวข้อ" class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?q={{ search_query|urlencode }}{% if show_all %}&show_all=true{% endif %}&page={{ page_obj.previous_page_number }}">ก่อนหน้า</a></li>{% else %}<li class="page-item disabled"><span class="page-link">ก่อนหน้า</span></li>{% endif %}
+            <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?q={{ search_query|urlencode }}{% if show_all %}&show_all=true{% endif %}&page={{ page_obj.next_page_number }}">ถัดไป</a></li>{% else %}<li class="page-item disabled"><span class="page-link">ถัดไป</span></li>{% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</section>
 
 <script>
     function setView(cols) {
-        const topicCols = document.querySelectorAll('.topic-col');
-        const btn1 = document.getElementById('btn-col-1');
-        const btn2 = document.getElementById('btn-col-2');
-
-        topicCols.forEach(col => {
-            col.classList.remove('col-12', 'col-md-6');
-            if (cols === 2) {
-                col.classList.add('col-12', 'col-md-6');
-            } else {
-                col.classList.add('col-12');
-            }
+        document.querySelectorAll('.topic-col').forEach((col) => {
+            col.classList.toggle('col-md-6', cols === 2);
         });
-
-        if (cols === 2) {
-            btn2.classList.add('active', 'btn-secondary');
-            btn2.classList.remove('btn-outline-secondary');
-            btn1.classList.remove('active', 'btn-secondary');
-            btn1.classList.add('btn-outline-secondary');
-        } else {
-            btn1.classList.add('active', 'btn-secondary');
-            btn1.classList.remove('btn-outline-secondary');
-            btn2.classList.remove('active', 'btn-secondary');
-            btn2.classList.add('btn-outline-secondary');
-        }
-
-        localStorage.setItem('topic_view_mode', cols);
+        document.getElementById('btn-col-1').classList.toggle('active', cols === 1);
+        document.getElementById('btn-col-2').classList.toggle('active', cols === 2);
+        localStorage.setItem('topic_view_mode', String(cols));
     }
-
     window.addEventListener('DOMContentLoaded', () => {
         const savedView = localStorage.getItem('topic_view_mode');
-        if (savedView) {
-            setView(parseInt(savedView));
-        }
+        if (savedView) setView(Number(savedView));
     });
 </script>
 {% endblock %}

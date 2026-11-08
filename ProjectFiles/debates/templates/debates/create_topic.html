@@ -1,219 +1,37 @@
 {% extends 'debates/base.html' %}
 
+{% block title %}ตั้งหัวข้อใหม่{% endblock %}
+
 {% block content %}
-<style>
-    .form-control:focus {
-        box-shadow: none !important;
-        border-color: #ced4da !important;
-    }
-    .input-group > .form-control,
-    .input-group > .btn {
-        margin: 0 !important;
-    }
-    .anonymous-box {
-        background-color: #fff4e6; 
-        border: 1px solid #ffc107; 
-        border-radius: 8px;
-        padding: 15px 20px;
-    }
-    .form-switch .form-check-input {
-        width: 3.5em;
-        height: 1.75em;
-        cursor: pointer;
-        margin-top: 0;
-        margin-left: 0 !important; 
-    }
-    .form-switch .form-check-input:checked {
-        background-color: #ff7b00;
-        border-color: #ff7b00;
-    }
-</style>
-
-<div class="row justify-content-center py-4">
-    <div class="col-md-10 col-lg-8">
-        <div class="mb-4 d-flex justify-content-between align-items-center">
-            <div>
-                <h2 class="fw-bold mb-1"><i class="bi bi-pencil-square me-2" style="color: #ff7b00;"></i>ตั้งหัวข้อใหม่</h2>
-                <p class="text-muted mb-0">สร้างหัวข้อเพื่อมาร่วมโหวตและแสดงมุมมอง</p>
+<div class="editor-layout">
+    <a href="{% url 'topic_list' %}" class="nav-link-quiet d-inline-flex align-items-center gap-2 mb-4"><i class="bi bi-arrow-left"></i>กลับหน้าหัวข้อ</a>
+    <div class="page-heading"><p class="eyebrow">ชวนชุมชนมาคิดไปด้วยกัน</p><h1 class="display-title">ตั้งหัวข้อใหม่</h1><p class="page-subtitle">อธิบายประเด็นให้ชัด แล้วเพิ่มตัวเลือกให้ทุกคนได้ร่วมโหวต</p></div>
+    <div class="surface-card p-4 p-md-5">
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}<div class="mb-3"><label class="form-label" for="{{ field.id_for_label }}">{% if field.name == 'tags_string' %}Tags{% else %}{{ field.label }}{% endif %}</label>{{ field }}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>{% endfor %}
+            <hr class="my-4">
+            <div class="d-flex justify-content-between align-items-center mb-3"><div><h2 class="h5 mb-1">ตัวเลือก</h2><p class="topic-meta mb-0">เพิ่มอย่างน้อยสองฝั่งให้ผู้เข้าร่วมเลือก</p></div></div>
+            <div id="sides-container" class="side-fields">
+                {% for side_name in side_names %}
+                <div class="input-group side-field mb-2"><span class="input-group-text">{{ forloop.counter|stringformat:'02d' }}</span><input type="text" name="sides" class="form-control" value="{{ side_name }}" placeholder="ชื่อตัวเลือก" aria-label="ชื่อตัวเลือกที่ {{ forloop.counter }}" required>{% if forloop.counter > 2 %}<button type="button" class="btn btn-outline-secondary" onclick="this.closest('.side-field').remove()" aria-label="ลบตัวเลือก">ลบ</button>{% endif %}</div>
+                {% endfor %}
             </div>
-        </div>
-        
-        <div class="card shadow-sm border-0" style="background-color: #fcfcfc;">
-            <div class="card-body p-4 p-md-5">
-                <form method="POST">
-                    {% csrf_token %}
-                    
-                    <!-- 1. กล่องติ๊กไม่ระบุตัวตน (ย้ายมาไว้บนสุด + จัดปุ่มไปขวา) -->
-                    <div class="anonymous-box shadow-sm mb-4 d-flex justify-content-between align-items-center gap-3">
-                        <label class="form-check-label m-0" for="{{ form.is_anonymous.id_for_label }}" style="cursor: pointer; user-select: none;">
-                            <strong style="color: #d84315; font-size: 1.1rem;"><i class="bi bi-incognito me-1"></i> ตั้งหัวข้อแบบไม่ระบุตัวตน</strong> <br>
-                            <span class="text-muted" style="font-size: 0.9rem;">(เมื่อเปิดใช้งาน จะซ่อนชื่อผู้ตั้งและผู้ที่เข้ามาคอมเมนต์ทั้งหมด)</span>
-                        </label>
-                        <div class="form-check form-switch m-0 p-0 d-flex align-items-center">
-                            {{ form.is_anonymous }}
-                        </div>
-                    </div>
-
-                    <!-- 2. ช่องกรอกชื่อหัวข้อ -->
-                    <div class="mb-4">
-                        <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">{{ form.title.label }}</label>
-                        {{ form.title }}
-                        {{ form.title.errors }}
-                    </div>
-
-                    <!-- 3. ช่องรายละเอียด -->
-                    <div class="mb-4">
-                        <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">{{ form.description.label }}</label>
-                        {{ form.description }}
-                        {{ form.description.errors }}
-                    </div>
-
-                    <!-- 4. ช่องวันที่ -->
-                    <div class="mb-4">
-                        <label for="{{ form.end_date.id_for_label }}" class="form-label fw-bold">{{ form.end_date.label }}</label>
-                        {{ form.end_date }}
-                        {{ form.end_date.errors }}
-                    </div>
-
-                    <!-- 5. ช่องใส่ Tags (ซ่อนไว้ให้ JS ทำงาน) -->
-                    <div class="mb-3">
-                        <label for="{{ form.tags_string.id_for_label }}" class="form-label fw-bold">{{ form.tags_string.label }}</label>
-                        {{ form.tags_string }}
-                        {{ form.tags_string.errors }}
-                    </div>
-                    
-                    <hr class="my-4 text-muted">
-                    
-                    <!-- ส่วนของตัวเลือก (Sides) -->
-                    <h5 class="fw-bold mb-3">กำหนดตัวเลือก (ฝั่ง)</h5>
-                    <div id="sides-container">
-                        {% for side_name in side_names %}
-                        <div class="input-group mb-2">
-                            <input type="text" name="sides" class="form-control" value="{{ side_name }}" placeholder="ตัวเลือกที่ {{ forloop.counter }}" required>
-                            {% if forloop.counter > 2 %}
-                            <button type="button" class="btn btn-outline-danger" onclick="this.parentElement.remove()" aria-label="ลบตัวเลือก">&times;</button>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                    </div>
-                    
-                    <!-- ปุ่มเพิ่มตัวเลือก  -->
-                    <button type="button" class="btn btn-outline-secondary btn-sm mt-1" onclick="addSide()">
-                        <i class="bi bi-plus-circle me-1"></i> เพิ่มตัวเลือก
-                    </button>
-                    
-                    <div class="d-flex gap-2 mt-4 pt-4 border-top">
-                        <button type="submit" class="btn btn-orange px-4 fw-bold">
-                            <i class="bi bi-send-fill me-1"></i> สร้างหัวข้อ
-                        </button>
-                        <a href="{% url 'topic_list' %}" class="btn btn-outline-secondary px-4">ยกเลิก</a>
-                    </div>
-                </form>
-            </div>
-        </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="addSide()"><i class="bi bi-plus-lg me-1"></i>เพิ่มตัวเลือก</button>
+            <div class="d-flex flex-wrap gap-2 mt-4 pt-4 border-top"><button type="submit" class="btn btn-primary">สร้างหัวข้อ</button><a href="{% url 'topic_list' %}" class="btn btn-outline-secondary">ยกเลิก</a></div>
+        </form>
     </div>
 </div>
-
+<style>.editor-layout{max-width:760px;margin:auto}.side-field .input-group-text{min-width:48px;justify-content:center;color:var(--muted);background:#f5f5f7;border-color:var(--line-strong);border-radius:12px 0 0 12px}.side-field .form-control{border-radius:0 12px 12px 0!important}</style>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const originalInput = document.getElementById('id_tags_string');
-        if (!originalInput) return;
-
-        originalInput.style.display = 'none';
-
-        const uiContainer = document.createElement('div');
-        uiContainer.innerHTML = `
-            <div class="input-group mb-2">
-                <input type="text" id="custom-tag-input" class="form-control" placeholder="พิมพ์แท็กที่ต้องการ แล้วกดปุ่ม + หรือ Enter">
-                <button type="button" id="btn-add-tag" class="btn btn-outline-orange">
-                    <i class="bi bi-plus-lg"></i> เพิ่ม
-                </button>
-            </div>
-            <div id="tag-bubble-container" class="d-flex flex-wrap gap-2 mb-3"></div>
-        `;
-        
-        originalInput.parentNode.insertBefore(uiContainer, originalInput.nextSibling);
-
-        const tagInput = document.getElementById('custom-tag-input');
-        const btnAdd = document.getElementById('btn-add-tag');
-        const bubbleContainer = document.getElementById('tag-bubble-container');
-        
-        let tags = [];
-
-        function renderTags() {
-            bubbleContainer.innerHTML = '';
-            tags.forEach((tag, index) => {
-                const badge = document.createElement('span');
-                badge.className = 'badge rounded-pill bg-light text-secondary fw-normal d-flex align-items-center px-3 py-2';
-                badge.style.fontSize = '14px';
-                badge.innerHTML = `
-                    <span class="me-2">#${tag}</span>
-                    <i class="bi bi-x-circle-fill tag-remove" data-index="${index}" style="cursor: pointer; opacity: 0.5;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5"></i>
-                `;
-                bubbleContainer.appendChild(badge);
-            });
-            
-            originalInput.value = tags.join(', ');
-        }
-
-        function addTag() {
-            const val = tagInput.value.trim();
-            if (val && !tags.includes(val)) {
-                tags.push(val);
-                renderTags();
-            }
-            tagInput.value = ''; 
-            tagInput.focus();
-        }
-
-        btnAdd.addEventListener('click', addTag);
-
-        tagInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault(); 
-                addTag();
-            }
-        });
-
-        bubbleContainer.addEventListener('click', function(e) {
-            if (e.target.classList.contains('tag-remove')) {
-                const idx = e.target.getAttribute('data-index');
-                tags.splice(idx, 1); 
-                renderTags();
-            }
-        });
-
-        if (originalInput.value) {
-            tags = originalInput.value.split(',').map(t => t.trim()).filter(t => t);
-            renderTags();
-        }
-    });
-
-    function addSide() {
-        const container = document.getElementById('sides-container');
-        const sideCount = container.children.length + 1;
-        
-        const div = document.createElement('div');
-        div.className = 'input-group mb-2';
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'sides';
-        input.className = 'form-control';
-        input.placeholder = 'ตัวเลือกที่ ' + sideCount;
-        input.required = true;
-        
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'btn btn-outline-danger';
-        removeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-        removeBtn.onclick = function() {
-            div.remove();
-        };
-        
-        div.appendChild(input);
-        div.appendChild(removeBtn);
-        container.appendChild(div);
-    }
+function addSide(){
+    const container=document.getElementById('sides-container');
+    const index=container.children.length+1;
+    const row=document.createElement('div'); row.className='input-group side-field mb-2';
+    const number=document.createElement('span'); number.className='input-group-text'; number.textContent=String(index).padStart(2,'0');
+    const input=document.createElement('input'); input.type='text'; input.name='sides'; input.className='form-control'; input.placeholder='ชื่อตัวเลือก'; input.setAttribute('aria-label','ชื่อตัวเลือกที่ '+index); input.required=true;
+    const remove=document.createElement('button'); remove.type='button'; remove.className='btn btn-outline-secondary'; remove.textContent='ลบ'; remove.setAttribute('aria-label','ลบตัวเลือก'); remove.onclick=()=>row.remove();
+    row.append(number,input,remove); container.appendChild(row);
+}
 </script>
 {% endblock %}

@@ -294,6 +294,21 @@ class DebatesViewClientTest(TestCase):
         )
         self.assertRedirects(res, reverse("topic_list"))
 
+        topic = Topic.objects.get(title="New Web Topic")
+        self.assertSetEqual(
+            set(topic.tags.values_list("name", flat=True)), {"web", "test"}
+        )
+
+        list_response = self.client.get(reverse("topic_list"))
+        self.assertContains(list_response, "web")
+        self.assertContains(list_response, "test")
+
+        detail_response = self.client.get(
+            reverse("topic_detail", args=[topic.id])
+        )
+        self.assertContains(detail_response, "web")
+        self.assertContains(detail_response, "test")
+
     def test_edit_topic_view_actions(self):
         """ทดสอบหน้าแก้ไขหัวข้อและการกดปิดโหวต"""
         self.client.login(username="viewuser", password="password123")

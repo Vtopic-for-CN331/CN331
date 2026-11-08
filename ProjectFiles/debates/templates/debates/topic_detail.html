@@ -1,159 +1,97 @@
 {% extends 'debates/base.html' %}
+{% load post_time %}
+
+{% block title %}{{ topic.title }}{% endblock %}
 
 {% block content %}
-    <!-- ส่วนหัวข้อกระทู้ และ ป้ายสถานะเวลา -->
-    <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <h2 class="mb-0 fw-bold">{{ topic.title }}</h2>
-            
+<section class="detail-page" aria-labelledby="topic-title">
+    <a href="{% url 'topic_list' %}" class="nav-link-quiet d-inline-flex align-items-center gap-2 mb-4"><i class="bi bi-arrow-left" aria-hidden="true"></i>หัวข้อทั้งหมด</a>
+    <article class="page-heading mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+                <p class="eyebrow">หัวข้อสนทนา</p>
+                <h1 class="display-title" id="topic-title">{{ topic.title }}</h1>
+                <p class="topic-time mt-2">{% show_post_time topic.created_at %} · ตั้งโดย {{ topic.created_by.username }}</p>
+                {% if topic.tags.all %}<div class="d-flex flex-wrap gap-2 mt-3" aria-label="Tags">{% for tag in topic.tags.all %}<span class="status-chip"><i class="bi bi-tag" aria-hidden="true"></i>{{ tag.name }}</span>{% endfor %}</div>{% endif %}
+            </div>
             <div>
                 {% if topic.end_date %}
-                    {% if topic.is_expired %}
-                        <span class="badge bg-danger rounded-pill px-3 py-2"><i class="bi bi-clock-history me-1"></i> ปิดโหวตแล้ว</span>
-                    {% else %}
-                        <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-clock me-1"></i> {{ topic.time_left_display }}</span>
-                    {% endif %}
-                {% else %}
-                    <span class="badge bg-primary rounded-pill px-3 py-2"><i class="bi bi-infinity me-1"></i> เปิดโหวตตลอด</span>
-                {% endif %}
+                    {% if topic.is_expired %}<span class="status-chip is-closed">ปิดโหวตแล้ว</span>
+                    {% else %}<span class="status-chip is-open"><i class="bi bi-clock" aria-hidden="true"></i>{{ topic.time_left_display }}</span>{% endif %}
+                {% else %}<span class="status-chip"><i class="bi bi-infinity" aria-hidden="true"></i>เปิดโหวตตลอด</span>{% endif %}
             </div>
         </div>
-        
-        <p class="text-secondary" style="font-size: 1.1rem;">{{ topic.description }}</p>
-    </div>
-    
-    <!-- ฟอร์มโหวต: แสดงตามสถานะหัวข้อและผู้ใช้ -->
+        <p class="page-subtitle">{{ topic.description }}</p>
+    </article>
+
     {% if topic.is_expired %}
-        <div class="alert alert-danger text-center shadow-sm border-0 mb-5 py-4" role="alert">
-            <h4 class="alert-heading mb-0"><i class="bi bi-x-circle-fill me-2"></i> หัวข้อนี้หมดเวลาโหวตแล้ว</h4>
-        </div>
+        <div class="alert alert-danger" role="status">การโหวตหัวข้อนี้ปิดแล้ว สามารถอ่านความคิดเห็นและผลสรุปได้</div>
     {% elif user_vote %}
-        <div class="alert alert-success mb-4 shadow-sm border-0" role="status">
-            คุณโหวตฝั่ง <strong>{{ user_vote.side.name }}</strong> แล้ว ขอบคุณที่ร่วมแสดงความคิดเห็น
-        </div>
+        <div class="alert alert-success" role="status">คุณโหวตฝั่ง <strong>{{ user_vote.side.name }}</strong> แล้ว ขอบคุณที่ร่วมแสดงความคิดเห็น</div>
     {% elif not user.is_authenticated %}
-        <div class="alert alert-info mb-4 shadow-sm border-0" role="status">
-            <a href="{% url 'login' %}?next={{ request.path|urlencode }}">เข้าสู่ระบบ</a> ก่อนลงคะแนน
-        </div>
+        <div class="alert alert-info" role="status"><a href="{% url 'login' %}?next={{ request.path|urlencode }}">เข้าสู่ระบบ</a> ก่อนลงคะแนน</div>
     {% elif not topic.sides.exists %}
-        <div class="alert alert-warning mb-4 shadow-sm border-0" role="status">หัวข้อนี้ยังไม่มีตัวเลือกสำหรับลงคะแนน</div>
+        <div class="alert alert-warning" role="status">หัวข้อนี้ยังไม่มีตัวเลือกสำหรับลงคะแนน</div>
     {% else %}
-        <div class="card shadow-sm mb-4 border-0" style="background-color: #fcfcfc;">
-            <div class="card-body p-4">
-                <h4 class="mb-3">เลือกฝั่งของคุณ</h4>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="mb-3">
+        <section class="surface-card p-4 p-md-5 mb-5" aria-labelledby="vote-title">
+            <p class="eyebrow">ร่วมแสดงความคิดเห็น</p>
+            <h2 class="h3 mb-4" id="vote-title">คุณคิดอย่างไร</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <fieldset class="mb-4">
+                    <legend class="form-label mb-3">เลือกฝั่งที่คุณเห็นด้วย</legend>
                     {% for side in topic.sides.all %}
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" id="side_{{ side.id }}" name="side" value="{{ side.id }}" required>
-                            <label class="form-check-label" for="side_{{ side.id }}">
-                                <strong>{{ side.name }}</strong> 
-                            </label>
-                        </div>
+                    <label class="vote-option d-flex align-items-center gap-3 p-3 mb-2">
+                        <input class="form-check-input m-0" type="radio" id="side_{{ side.id }}" name="side" value="{{ side.id }}" required>
+                        <span class="vote-option-dot vote-dot-{{ forloop.counter }}"></span>
+                        <span>{{ side.name }}</span>
+                    </label>
                     {% endfor %}
-                    </div>
-                    <textarea name="comment_text" rows="3" class="form-control mb-3" placeholder="พิมพ์เหตุผลที่คุณเลือกฝั่งนี้..." required></textarea>
-                    <button type="submit" class="btn btn-orange px-4 fw-bold">ยืนยันผลโหวต</button>
-                </form>
-            </div>
-        </div>
+                </fieldset>
+                <label for="comment_text" class="form-label">เหตุผลของคุณ</label>
+                <textarea id="comment_text" name="comment_text" rows="4" class="form-control mb-3" placeholder="เล่ามุมมองของคุณให้คนอื่นเข้าใจ" required></textarea>
+                <button type="submit" class="btn btn-primary">ส่งคะแนนและความคิดเห็น</button>
+            </form>
+        </section>
     {% endif %}
 
-    <!-- สรุปผลโหวต -->
     {% with total_votes=topic.vote_count %}
         {% if total_votes > 0 %}
-            <h3 class="mb-3 mt-5">สรุปผลโหวต</h3>
-            <div class="card shadow-sm border-0 mb-5">
-                <div class="card-body p-4">
-                    <div class="d-flex flex-wrap justify-content-between mb-3 px-2">
-                        {% for side in topic.sides.all %}
-                            <div class="{% if forloop.first %}text-start{% elif forloop.last %}text-end{% else %}text-center{% endif %}" style="flex: 1;">
-                                <span style="color: {% if forloop.counter == 1 %}#ff7b00{% elif forloop.counter == 2 %}#6c757d{% elif forloop.counter == 3 %}#0d6efd{% else %}#198754{% endif %};">●</span>
-                                <strong>{{ side.name }}</strong>
-                                <div class="text-secondary small">{{ side.vote_count }} โหวต ({{ side.percentage|stringformat:'.1f' }}%)</div>
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="progress" style="height: 24px; border-radius: 12px;">
-                        {% for side in topic.sides.all %}
-                            {% if side.vote_count > 0 %}
-                            <div class="progress-bar fw-bold" role="progressbar" 
-                                 style="width: {{ side.percentage|stringformat:'.1f' }}%;
-                                        background-color: {% if forloop.counter == 1 %}#ff7b00{% elif forloop.counter == 2 %}#6c757d{% elif forloop.counter == 3 %}#0d6efd{% else %}#198754{% endif %};" 
-                                 aria-valuenow="{{ side.percentage|stringformat:'.1f' }}" aria-valuemin="0" aria-valuemax="100">
-                                {{ side.percentage|stringformat:'.1f' }}%
-                            </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    
-                    <p class="text-muted text-center mt-4 mb-0"><small>ผู้เข้าร่วมทั้งหมด {{ total_votes }} คน</small></p>
+        <section class="mb-5" aria-labelledby="results-title">
+            <div class="d-flex align-items-end justify-content-between mb-3"><div><p class="eyebrow">ผลล่าสุด</p><h2 class="h3 mb-0" id="results-title">ผลโหวต</h2></div><span class="topic-meta">{{ total_votes }} คะแนน</span></div>
+            <div class="surface-card p-4">
+                {% for side in topic.sides.all %}
+                <div class="result-row mb-3">
+                    <div class="d-flex justify-content-between gap-3 mb-2"><span><i class="vote-dot vote-dot-{{ forloop.counter }}"></i>{{ side.name }}</span><span class="topic-meta">{{ side.vote_count }} · {{ side.percentage|floatformat:1 }}%</span></div>
+                    <div class="vote-track"><span class="vote-segment vote-segment-{{ forloop.counter }}" style="width: {{ side.percentage|floatformat:1 }}%"></span></div>
                 </div>
+                {% endfor %}
+                <p class="topic-meta mb-0 mt-4">ผลรวมจากผู้เข้าร่วม {{ total_votes }} คน</p>
             </div>
+        </section>
         {% endif %}
     {% endwith %}
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 mt-4 gap-2">
-        <h3 class="mb-0">ความคิดเห็นจากผู้โหวต</h3>
-        
-        {% if topic.comments.exists %}
-        <form method="GET" action="" class="d-flex align-items-center">
-            <select name="side_filter" class="form-select form-select-sm shadow-sm py-2 px-3" onchange="this.form.submit()" style="min-width: 240px; cursor: pointer; border-radius: 8px;">
-                <option value="">แสดงความคิดเห็นทั้งหมด</option>
-                {% for side in topic.sides.all %}
-                    <option value="{{ side.id }}" {% if selected_side_id == side.id|stringformat:'s' %}selected{% endif %}>
-                        ฝั่ง: {{ side.name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </form>
-        {% endif %}
-    </div>
-
-    <style>
-        .form-select {
-            border: 1px solid #ced4da;
-            transition: all 0.2s ease-in-out;
-        }
-        .form-select:focus {
-            border-color: #ff7b00 !important;
-            box-shadow: 0 0 0 0.25rem rgba(255, 123, 0, 0.15) !important;
-        }
-    </style>
-
-    <div class="comment-section">
-        {% for comment in comments %}
-            <div class="card mb-3 border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <strong>
-                            <span style="color: #ff7b00;">
-                                {% if topic.is_anonymous %}
-                                    <i class="bi bi-incognito"></i> {{ comment.author.username|slice:":2" }}***
-                                {% else %}
-                                    @{{ comment.author.username }}
-                                {% endif %}
-                            </span>
-                        </strong>
-                        <span class="badge border border-warning text-warning bg-light">
-                            เลือกฝั่ง: {{ comment.side.name|default:"ยังไม่เลือกฝั่ง" }}
-                        </span>
-                    </div>
-                    <p class="card-text mb-0">{{ comment.text }}</p>
-                </div>
-            </div>
-        {% empty %}
-            <div class="alert alert-light text-center border py-4 shadow-sm" role="alert">
-                <i class="bi bi-chat-square-text text-muted fs-4 d-block mb-2"></i>
-                ยังไม่มีความคิดเห็นในตัวเลือกนี้ หรือยังไม่มีผู้แสดงมุมมอง
-            </div>
-        {% endfor %}
-    </div>
-    
-    <!-- ปุ่มกลับหน้าแรก -->
-    <div class="mt-4 mb-5">
-        <a href="{% url 'topic_list' %}" class="btn btn-outline-secondary">← กลับหน้าแรก</a>
-    </div>
+    <section aria-labelledby="comments-title">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3"><h2 class="h3 mb-0" id="comments-title">Comments</h2>{% if topic.comments.exists %}<form method="GET"><label class="visually-hidden" for="side_filter">Filter by side</label><select id="side_filter" name="side_filter" class="form-select" onchange="this.form.submit()"><option value="">ทุกความคิดเห็น</option>{% for side in topic.sides.all %}<option value="{{ side.id }}" {% if selected_side_id == side.id|stringformat:'s' %}selected{% endif %}>{{ side.name }}</option>{% endfor %}</select></form>{% endif %}</div>
+        <div class="comment-list">
+            {% for comment in comments %}
+            <article class="comment-card surface-card p-4 mb-3">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2"><strong>{% if topic.is_anonymous %}<i class="bi bi-incognito"></i> {{ comment.author.username|slice:":2" }}***{% else %}{{ comment.author.username }}{% endif %}</strong><span class="status-chip">{{ comment.side.name|default:"ยังไม่เลือกฝั่ง" }}</span></div>
+                <p class="mb-0">{{ comment.text }}</p>
+            </article>
+            {% empty %}
+            <div class="surface-card p-4 text-center"><p class="mb-0">No comments yet</p></div>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+<style>
+    .vote-option { cursor: pointer; color: var(--ink); background: var(--surface-soft); border: 1px solid var(--line); border-radius: 14px; transition: background-color 150ms ease, border-color 150ms ease; }
+    .vote-option:hover { background: var(--blue-soft); border-color: rgba(0, 113, 227, .25); }
+    .vote-option-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+    .vote-option .vote-dot-2 { background: #a6a6ab; }
+    .vote-option .vote-dot-3 { background: #d4a05f; }
+    .vote-option .vote-dot-4 { background: #75a38c; }
+</style>
 {% endblock %}
