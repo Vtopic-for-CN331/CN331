@@ -1,6 +1,4 @@
 ## Academic Portal (CN331)
-[![CI](https://github.com/Vtopic-for-CN331/CN331/blob/main/.github/workflows/main.yml)](...)
-
 ## Live Production : https://debate-portal.onrender.com/
 
 ## System Overview
