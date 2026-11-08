@@ -4,7 +4,7 @@
     <!-- หัวข้อโปรไฟล์และปุ่มกลับ -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">
-            <i class="bi bi-person-circle me-2" style="color: #ff7b00;"></i>โปรไฟล์ของ {{ user.username }}
+            <i class="bi bi-person-circle me-2" style="color: var(--moss);"></i>โปรไฟล์ของ {{ user.username }}
         </h2>
         <a href="{% url 'topic_list' %}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left me-1"></i>กลับหน้าแรก
@@ -16,7 +16,7 @@
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm border-0 h-100" style="background-color: #fcfcfc;">
                 <div class="card-body p-4">
-                    <h4 class="mb-4"><i class="bi bi-card-list me-2" style="color: #ff7b00;"></i>หัวข้อที่ {{ user.username }} ตั้ง</h4>
+                    <h4 class="mb-4"><i class="bi bi-card-list me-2" style="color: var(--moss);"></i>หัวข้อที่ {{ user.username }} ตั้ง</h4>
                     
                     <div class="list-group list-group-flush">
                         {% for topic in my_topics %}
@@ -36,7 +36,7 @@
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm border-0 h-100" style="background-color: #fcfcfc;">
                 <div class="card-body p-4">
-                    <h4 class="mb-4"><i class="bi bi-chat-left-text me-2" style="color: #ff7b00;"></i>ประวัติการโหวต</h4>
+                    <h4 class="mb-4"><i class="bi bi-chat-left-text me-2" style="color: var(--moss);"></i>ประวัติการโหวต</h4>
                     
                     {% for comment in my_comments %}
                         <div class="card mb-3 border-0 shadow-sm">
@@ -46,7 +46,7 @@
                                         โหวตฝั่ง: {{ comment.side.name }}
                                     </span>
                                     <small class="text-muted">
-                                        ในกระทู้ <a href="{% url 'topic_detail' comment.topic.id %}" style="color: #ff7b00; text-decoration: none;">{{ comment.topic.title }}</a>
+                                        ในกระทู้ <a href="{% url 'topic_detail' comment.topic.id %}" style="color: var(--moss); text-decoration: none;">{{ comment.topic.title }}</a>
                                     </small>
                                 </div>
                                 <p class="card-text mb-0"><i class="bi bi-quote text-muted"></i> {{ comment.text }}</p>

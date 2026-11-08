@@ -7,14 +7,14 @@
     <div class="col-md-3 mb-3 mb-md-0">
         <h2 class="mb-0 fw-bold">หัวข้อ Topics</h2>
     </div>
-    
+
     <div class="col-md-9">
         <div class="d-flex flex-wrap gap-2 justify-content-md-end align-items-center">
             <!-- ฟอร์มค้นหา -->
             <form method="GET" action="{% url 'topic_list' %}" class="flex-grow-1" style="max-width: 350px; margin-bottom: 0;">
                 <div class="input-group shadow-sm align-items-stretch">
                     <span class="input-group-text bg-white border-end-0 d-flex align-items-center">
-                        <i class="bi bi-search" style="color: #ff7b00;"></i>
+                        <i class="bi bi-search" style="color: var(--moss);"></i>
                     </span>
                     <input type="text" name="q" value="{{ search_query|default_if_none:'' }}" class="form-control border-start-0 m-0" placeholder="ค้นหาชื่อกระทู้..." style="box-shadow: none; margin: 0 !important;">
                     <button class="btn btn-dark px-3 m-0" type="submit" style="margin: 0 !important;">ค้นหา</button>
@@ -30,7 +30,7 @@
                     <i class="bi bi-grid-fill"></i>
                 </button>
             </div>
-            
+
             <!-- ปุ่มตั้งหัวข้อใหม่ -->
             <a href="{% url 'create_topic' %}" class="btn btn-orange shadow-sm d-flex align-items-center text-nowrap">
                 <i class="bi bi-plus-circle me-1"></i> ตั้งหัวข้อใหม่
@@ -45,14 +45,14 @@
     <!-- ค่าเริ่มต้นให้เป็น col-12 (แถวละ 1) -->
     <div class="col-12 topic-col mb-4">
         <div class="topic-card h-100">
-            
+
             <!-- ชื่อหัวข้อและป้ายเวลา -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-2 gap-2">
                 <h2 class="mb-0 order-2 order-md-1" style="font-size: 1.4rem;">
                     {{ topic.title }}
                     <small class="text-muted fw-normal" style="font-size: 0.7em;">{% show_post_time topic.created_at %}</small>
                 </h2>
-                
+
                 <div class="order-1 order-md-2 align-self-start">
                     {% if topic.end_date %}
                         {% if topic.is_expired %}
@@ -78,19 +78,19 @@
                         <div class="d-flex flex-wrap gap-3 mb-1" style="font-size: 13px;">
                             {% for side in topic.sides.all %}
                                 <span>
-                                    <span style="color: {% if forloop.counter == 1 %}#ff7b00{% elif forloop.counter == 2 %}#6c757d{% elif forloop.counter == 3 %}#0d6efd{% else %}#198754{% endif %};">●</span>
+                                    <span style="color: {% if forloop.counter == 1 %}#56634a{% elif forloop.counter == 2 %}#a77957{% elif forloop.counter == 3 %}#8b9180{% else %}#777166{% endif %};">●</span>
                                     {{ side.name }} ({{ side.vote_count }})
                                 </span>
                             {% endfor %}
                             <span class="text-muted ms-auto">โหวตแล้ว {{ total_votes }} คน</span>
                         </div>
-                        
+
                         <div class="progress" style="height: 10px; border-radius: 5px;">
                             {% for side in topic.sides.all %}
                                 {% if side.vote_count > 0 %}
-                                <div class="progress-bar" role="progressbar" 
+                                <div class="progress-bar" role="progressbar"
                                      style="width: {% widthratio side.vote_count total_votes 100 %}%;
-                                            background-color: {% if forloop.counter == 1 %}#ff7b00{% elif forloop.counter == 2 %}#6c757d{% elif forloop.counter == 3 %}#0d6efd{% else %}#198754{% endif %};" 
+                                            background-color: {% if forloop.counter == 1 %}#56634a{% elif forloop.counter == 2 %}#a77957{% elif forloop.counter == 3 %}#8b9180{% else %}#777166{% endif %};"
                                      aria-valuenow="{% widthratio side.vote_count total_votes 100 %}" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                                 {% endif %}

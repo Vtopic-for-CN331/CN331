@@ -8,7 +8,7 @@
         <h2 class="mb-2">{{ topic.title }}</h2>
         <p class="text-muted small mb-2">{% show_post_time topic.created_at %}</p>
         <p class="text-secondary" style="font-size: 1.1rem;">{{ topic.description }}</p>
-        
+
         {% if topic.end_date %}
             {% if topic.is_expired %}
                 <span class="badge bg-danger rounded-pill px-3 py-2 mt-1"><i class="bi bi-clock-history me-1"></i> ปิดโหวตแล้ว</span>
@@ -19,7 +19,7 @@
             <span class="badge bg-primary rounded-pill px-3 py-2 mt-1"><i class="bi bi-infinity me-1"></i> เปิดโหวตตลอด</span>
         {% endif %}
     </div>
-    
+
     <!-- ฟอร์มโหวต: แสดงตามสถานะหัวข้อและผู้ใช้ -->
     {% if topic.is_expired %}
         <div class="alert alert-danger text-center shadow-sm border-0 mb-5 py-4" role="alert">
@@ -46,7 +46,7 @@
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="radio" id="side_{{ side.id }}" name="side" value="{{ side.id }}" required>
                             <label class="form-check-label" for="side_{{ side.id }}">
-                                <strong>{{ side.name }}</strong> 
+                                <strong>{{ side.name }}</strong>
                             </label>
                         </div>
                     {% endfor %}
@@ -67,7 +67,7 @@
                     <div class="d-flex flex-wrap justify-content-between mb-3 px-2">
                         {% for side in topic.sides.all %}
                             <div class="{% if forloop.first %}text-start{% elif forloop.last %}text-end{% else %}text-center{% endif %}" style="flex: 1;">
-                                <span style="color: {% if forloop.counter == 1 %}#ff7b00{% elif forloop.counter == 2 %}#6c757d{% elif forloop.counter == 3 %}#0d6efd{% else %}#198754{% endif %};">●</span>
+                                <span style="color: {% if forloop.counter == 1 %}#56634a{% elif forloop.counter == 2 %}#a77957{% elif forloop.counter == 3 %}#8b9180{% else %}#777166{% endif %};">●</span>
                                 <strong>{{ side.name }}</strong>
                                 <div class="text-secondary small">{{ side.vote_count }} โหวต ({% widthratio side.vote_count total_votes 100 %}%)</div>
                             </div>
@@ -77,16 +77,16 @@
                     <div class="progress" style="height: 24px; border-radius: 12px;">
                         {% for side in topic.sides.all %}
                             {% if side.vote_count > 0 %}
-                            <div class="progress-bar fw-bold" role="progressbar" 
+                            <div class="progress-bar fw-bold" role="progressbar"
                                  style="width: {% widthratio side.vote_count total_votes 100 %}%;
-                                        background-color: {% if forloop.counter == 1 %}#ff7b00{% elif forloop.counter == 2 %}#6c757d{% elif forloop.counter == 3 %}#0d6efd{% else %}#198754{% endif %};" 
+                                        background-color: {% if forloop.counter == 1 %}#56634a{% elif forloop.counter == 2 %}#a77957{% elif forloop.counter == 3 %}#8b9180{% else %}#777166{% endif %};"
                                  aria-valuenow="{% widthratio side.vote_count total_votes 100 %}" aria-valuemin="0" aria-valuemax="100">
                                 {% widthratio side.vote_count total_votes 100 %}%
                             </div>
                             {% endif %}
                         {% endfor %}
                     </div>
-                    
+
                     <p class="text-muted text-center mt-4 mb-0"><small>ผู้เข้าร่วมทั้งหมด {{ total_votes }} คน</small></p>
                 </div>
             </div>
@@ -100,7 +100,7 @@
             <div class="card mb-3 border-0 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <strong><span style="color: #ff7b00;">@{{ comment.author.username }}</span></strong>
+                        <strong><span style="color: var(--moss);">@{{ comment.author.username }}</span></strong>
                         <span class="badge border border-warning text-warning bg-light">
                             เลือกฝั่ง: {{ comment.side.name|default:"ยังไม่เลือกฝั่ง" }}
                         </span>
@@ -114,7 +114,7 @@
             </div>
         {% endfor %}
     </div>
-    
+
     <!-- ปุ่มกลับหน้าแรก -->
     <div class="mt-4">
         <a href="{% url 'topic_list' %}" class="btn btn-outline-secondary">← กลับหน้าแรก</a>
