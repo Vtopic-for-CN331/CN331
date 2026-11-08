@@ -238,3 +238,4 @@ class DebatesViewClientTest(TestCase):
         self.client.login(username='viewuser', password='password123')
         res = self.client.post(reverse('delete_topic', args=[self.topic.id]))
         self.assertRedirects(res, reverse('topic_list'))
+
