@@ -1,4 +1,5 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -50,6 +51,22 @@ class DebateTests(TestCase):
 
         search_response = self.client.get(reverse("topic_list"), {"q": "คำนี้ได้"})
         self.assertNotContains(search_response, expired.title)
+
+    def test_topic_list_displays_post_date_and_time(self):
+        posted_at = datetime(2026, 11, 5, 14, 30, tzinfo=ZoneInfo("Asia/Bangkok"))
+        Topic.objects.filter(id=self.topic.id).update(created_at=posted_at)
+
+        response = self.client.get(reverse("topic_list"))
+
+        self.assertContains(response, "โพสต์เมื่อ 05/11/2026 14:30")
+
+    def test_topic_detail_displays_post_date_and_time(self):
+        posted_at = datetime(2026, 11, 5, 14, 30, tzinfo=ZoneInfo("Asia/Bangkok"))
+        Topic.objects.filter(id=self.topic.id).update(created_at=posted_at)
+
+        response = self.client.get(reverse("topic_detail", args=[self.topic.id]))
+
+        self.assertContains(response, "โพสต์เมื่อ 05/11/2026 14:30")
 
     def test_topic_list_is_newest_first_and_paginated(self):
         older = self.topic

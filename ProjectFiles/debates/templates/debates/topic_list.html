@@ -1,4 +1,5 @@
 {% extends 'debates/base.html' %}
+{% load post_time %}
 
 {% block content %}
 <!-- ส่วนหัว, ช่องค้นหา, และปุ่มสลับมุมมอง -->
@@ -47,7 +48,10 @@
             
             <!-- ชื่อหัวข้อและป้ายเวลา -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-2 gap-2">
-                <h2 class="mb-0 order-2 order-md-1" style="font-size: 1.4rem;">{{ topic.title }}</h2>
+                <h2 class="mb-0 order-2 order-md-1" style="font-size: 1.4rem;">
+                    {{ topic.title }}
+                    <small class="text-muted fw-normal" style="font-size: 0.7em;">{% show_post_time topic.created_at %}</small>
+                </h2>
                 
                 <div class="order-1 order-md-2 align-self-start">
                     {% if topic.end_date %}
