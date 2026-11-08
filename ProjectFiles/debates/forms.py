@@ -79,7 +79,7 @@ class CustomSignupForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["username"].help_text = ""
-        password_help_html = (
+        password_help_html = (  # nosec B105
             '<ul style="padding-left: 20px; margin-top: 5px; '
             'color: #6c757d; font-size: 0.9em;">\n'
             "    <li>รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร</li>\n"
