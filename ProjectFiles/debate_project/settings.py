@@ -56,7 +56,7 @@ MIDDLEWARE = [
 
 # โหลด WhiteNoise เฉพาะเมื่อมีการติดตั้งแพ็กเกจ (บน Render)
 try:
-    import whitenoise  # noqa: F401
+    import whitenoise  # noqa: F401, F811
 
     MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 except ImportError:
@@ -136,7 +136,7 @@ STORAGES = {
 
 # ใช้งาน WhiteNoise Storage เมื่อมีแพ็กเกจ (บน Render)
 try:
-    import whitenoise  # noqa: F401
+    import whitenoise  # noqa: F401, F811
 
     STORAGES["staticfiles"][
         "BACKEND"
