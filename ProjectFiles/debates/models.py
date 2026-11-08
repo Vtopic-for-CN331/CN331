@@ -68,9 +68,7 @@ class Topic(models.Model):
 
 
 class Side(models.Model):
-    topic = models.ForeignKey(
-        Topic, on_delete=models.CASCADE, related_name="sides"
-    )
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="sides")
     name = models.CharField(
         max_length=100, verbose_name="ชื่อฝั่ง (เช่น เห็นด้วย/ไม่เห็นด้วย)"
     )
@@ -93,9 +91,7 @@ class Side(models.Model):
 
 
 class Comment(models.Model):
-    topic = models.ForeignKey(
-        Topic, on_delete=models.CASCADE, related_name="comments"
-    )
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name="ผู้คอมเมนต์"
     )
@@ -117,5 +113,6 @@ class Comment(models.Model):
                 name="unique_vote_per_user_topic",
             )
         ]
+
     def __str__(self):
         return f"Comment by {self.author.username} on {self.topic.title}"

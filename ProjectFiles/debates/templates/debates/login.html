@@ -4,11 +4,56 @@
 
 {% block content %}
 <div class="auth-layout">
-    <div class="auth-heading"><span class="brand-mark auth-mark"><i class="bi bi-chat-square-text"></i></span><p class="eyebrow mt-4">ยินดีต้อนรับกลับ</p><h1 class="display-title">เข้าสู่ระบบ</h1><p class="page-subtitle">กลับมาร่วมแลกเปลี่ยนมุมมองกับชุมชน</p></div>
-    <div class="surface-card p-4 p-md-5">
-        <form method="POST">{% csrf_token %}{{ form.as_p }}<button type="submit" class="btn btn-primary w-100 mt-2">เข้าสู่ระบบ</button></form>
+    <div class="auth-heading text-center">
+        <span class="brand-mark auth-mark d-inline-flex justify-content-center align-items-center mx-auto"><i class="bi bi-chat-square-text"></i></span>
+        <p class="eyebrow mt-4">ยินดีต้อนรับกลับ</p>
+        <h1 class="display-title">เข้าสู่ระบบ</h1>
+        <p class="page-subtitle">กลับมาร่วมแลกเปลี่ยนมุมมองกับชุมชน</p>
     </div>
+    
+    <div class="surface-card p-4 p-md-5">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary w-100 mt-4">เข้าสู่ระบบ</button>
+        </form>
+    </div>
+    
     <p class="auth-switch">ยังไม่มีบัญชี <a href="{% url 'signup' %}">สมัครสมาชิก</a></p>
 </div>
-<style>.auth-layout{max-width:440px;margin:32px auto 0}.auth-heading{margin-bottom:24px}.auth-mark{width:42px;height:42px;border-radius:14px;font-size:18px}.auth-switch{margin:20px 0 0;text-align:center;font-size:14px}</style>
+
+<style>
+    .auth-layout {
+        max-width: 440px;
+        margin: 32px auto 0;
+    }
+    .auth-heading {
+        margin-bottom: 24px;
+    }
+    .auth-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        font-size: 18px;
+    }
+    .auth-switch {
+        margin: 20px 0 0;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .surface-card form p {
+        text-align: left; 
+        margin-bottom: 1.2rem; 
+    }
+    .surface-card form p label {
+        display: block; 
+        margin-bottom: 0.5rem; 
+        font-size: 14px; 
+    }
+    .surface-card form p input {
+        width: 100%; 
+        box-sizing: border-box; 
+    }
+</style>
 {% endblock %}

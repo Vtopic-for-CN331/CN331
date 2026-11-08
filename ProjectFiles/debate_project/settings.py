@@ -57,6 +57,7 @@ MIDDLEWARE = [
 # โหลด WhiteNoise เฉพาะเมื่อมีการติดตั้งแพ็กเกจ (บน Render)
 try:
     import whitenoise  # noqa: F401
+
     MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 except ImportError:
     pass
@@ -103,22 +104,13 @@ AUTH_PASSWORD_VALIDATORS = [
         ),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "MinimumLengthValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation." "MinimumLengthValidator"),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "CommonPasswordValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation." "CommonPasswordValidator"),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "NumericPasswordValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation." "NumericPasswordValidator"),
     },
 ]
 
@@ -145,9 +137,10 @@ STORAGES = {
 # ใช้งาน WhiteNoise Storage เมื่อมีแพ็กเกจ (บน Render)
 try:
     import whitenoise  # noqa: F401
-    STORAGES["staticfiles"]["BACKEND"] = (
-        "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    )
+
+    STORAGES["staticfiles"][
+        "BACKEND"
+    ] = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 except ImportError:
     pass
 

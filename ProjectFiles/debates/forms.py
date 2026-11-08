@@ -30,9 +30,7 @@ class TopicForm(forms.ModelForm):
         }
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(
-                attrs={"class": "form-control", "rows": 5}
-            ),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
             "end_date": forms.DateTimeInput(
                 attrs={"type": "datetime-local", "class": "form-control"}
             ),
@@ -88,7 +86,7 @@ class CustomSignupForm(UserCreationForm):
             "    <li>รหัสผ่านต้องไม่ประกอบด้วยตัวเลขเพียงอย่างเดียว</li>\n"
             "</ul>"
         )
-        self.fields["password1"].help_text = mark_safe(password_help_html)   # nosec B308
+        self.fields["password1"].help_text = mark_safe(password_help_html)  # nosec B308
         help_text_p2 = (
             '<span style="color: #6c757d; font-size: 0.9em;">'
             "กรอกรหัสผ่านอีกครั้ง</span>"

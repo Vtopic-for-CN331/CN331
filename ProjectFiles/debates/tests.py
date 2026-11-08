@@ -36,9 +36,7 @@ class TopicModelTest(TestCase):
 
 class SideAndCommentModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            username="subuser", password="password123"
-        )
+        self.user = User.objects.create_user(username="subuser", password="password123")
         self.topic = Topic.objects.create(
             title="Sample Topic",
             description="Desc",
@@ -91,12 +89,8 @@ class DebatesFormTest(TestCase):
 
 class DebatesServiceAndSelectorTest(TestCase):
     def setUp(self):
-        self.user1 = User.objects.create_user(
-            username="user1", password="password123"
-        )
-        self.user2 = User.objects.create_user(
-            username="user2", password="password123"
-        )
+        self.user1 = User.objects.create_user(username="user1", password="password123")
+        self.user2 = User.objects.create_user(username="user2", password="password123")
 
     def test_create_topic_with_sides_service(self):
         """ทดสอบ Service การสร้าง Topic พร้อม Sides และ Tags"""
@@ -110,9 +104,7 @@ class DebatesServiceAndSelectorTest(TestCase):
         )
         self.assertTrue(form.is_valid())
 
-        topic = services.create_topic_with_sides(
-            self.user1, form, ["Cats", "Dogs"]
-        )
+        topic = services.create_topic_with_sides(self.user1, form, ["Cats", "Dogs"])
         self.assertEqual(topic.title, "Cats vs Dogs")
         self.assertEqual(topic.sides.count(), 2)
         self.assertEqual(topic.tags.count(), 2)
@@ -122,9 +114,7 @@ class DebatesServiceAndSelectorTest(TestCase):
         form = TopicForm(data={"title": "Single Side", "description": "Desc"})
         self.assertTrue(form.is_valid())
         with self.assertRaises(ValidationError):
-            services.create_topic_with_sides(
-                self.user1, form, ["Only One Side"]
-            )
+            services.create_topic_with_sides(self.user1, form, ["Only One Side"])
 
     def test_submit_vote_and_validation(self):
         """ทดสอบการโหวตและข้อผิดพลาดห้ามโหวตซ้ำ"""
@@ -227,9 +217,7 @@ class DebatesServiceAndSelectorTest(TestCase):
             created_by=self.user1,
         )
         side = Side.objects.create(topic=t1, name="Agree")
-        Comment.objects.create(
-            topic=t1, side=side, author=self.user2, text="Nice"
-        )
+        Comment.objects.create(topic=t1, side=side, author=self.user2, text="Nice")
 
         # Search & user queries
         self.assertIn(t1, selectors.get_topics(search_query="Python"))
@@ -257,9 +245,7 @@ class DebatesViewClientTest(TestCase):
 
     def test_topic_list_views(self):
         """ทดสอบหน้า Topic List ทั้งแบบค้นหา และแสดงกระทู้ที่หมดอายุ"""
-        res = self.client.get(
-            reverse("topic_list"), {"q": "View", "show_all": "true"}
-        )
+        res = self.client.get(reverse("topic_list"), {"q": "View", "show_all": "true"})
         self.assertEqual(res.status_code, 200)
 
     def test_topic_detail_post_voting_and_filtering(self):
@@ -303,9 +289,7 @@ class DebatesViewClientTest(TestCase):
         self.assertContains(list_response, "web")
         self.assertContains(list_response, "test")
 
-        detail_response = self.client.get(
-            reverse("topic_detail", args=[topic.id])
-        )
+        detail_response = self.client.get(reverse("topic_detail", args=[topic.id]))
         self.assertContains(detail_response, "web")
         self.assertContains(detail_response, "test")
 
@@ -316,17 +300,13 @@ class DebatesViewClientTest(TestCase):
 
         # ปิดโหวตผ่าน action
         res = self.client.post(edit_url, {"action": "close_voting"})
-        self.assertRedirects(
-            res, reverse("topic_detail", args=[self.topic.id])
-        )
+        self.assertRedirects(res, reverse("topic_detail", args=[self.topic.id]))
 
         # แก้ไขข้อมูลปกติ
         res = self.client.post(
             edit_url, {"title": "Edited Title", "description": "Edited Desc"}
         )
-        self.assertRedirects(
-            res, reverse("topic_detail", args=[self.topic.id])
-        )
+        self.assertRedirects(res, reverse("topic_detail", args=[self.topic.id]))
 
     def test_user_profile_view(self):
         """ทดสอบหน้าดูโปรไฟล์ส่วนตัว"""
@@ -358,7 +338,5 @@ class DebatesViewClientTest(TestCase):
         res_all = self.client.get(reverse("topic_list"), {"show_all": "true"})
         self.assertEqual(res_all.status_code, 200)
 
-        res_active = self.client.get(
-            reverse("topic_list"), {"show_all": "false"}
-        )
+        res_active = self.client.get(reverse("topic_list"), {"show_all": "false"})
         self.assertEqual(res_active.status_code, 200)
