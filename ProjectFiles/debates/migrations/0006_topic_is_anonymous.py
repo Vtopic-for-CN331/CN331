@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('debates', '0005_topic_tags_alter_tag_name'),
+        ("debates", "0005_topic_tags_alter_tag_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='topic',
-            name='is_anonymous',
-            field=models.BooleanField(default=False, verbose_name='ตั้งหัวข้อแบบไม่ระบุตัวตน (ซ่อนชื่อผู้ตั้งและผู้คอมเมนต์ทั้งหมด)'),
+            model_name="topic",
+            name="is_anonymous",
+            field=models.BooleanField(
+                default=False,
+                verbose_name="ตั้งหัวข้อแบบไม่ระบุตัวตน (ซ่อนชื่อผู้ตั้งและผู้คอมเมนต์ทั้งหมด)",
+            ),
         ),
     ]

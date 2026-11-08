@@ -6,18 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('debates', '0004_tag'),
+        ("debates", "0004_tag"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='topic',
-            name='tags',
-            field=models.ManyToManyField(blank=True, related_name='topics', to='debates.tag', verbose_name='แท็ก'),
+            model_name="topic",
+            name="tags",
+            field=models.ManyToManyField(
+                blank=True, related_name="topics", to="debates.tag", verbose_name="แท็ก"
+            ),
         ),
         migrations.AlterField(
-            model_name='tag',
-            name='name',
-            field=models.CharField(max_length=50, unique=True, verbose_name='ชื่อแท็ก'),
+            model_name="tag",
+            name="name",
+            field=models.CharField(max_length=50, unique=True, verbose_name="ชื่อแท็ก"),
         ),
     ]

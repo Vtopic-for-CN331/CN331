@@ -99,9 +99,7 @@ def create_topic(request):
         side_names = request.POST.getlist("sides")
         if form.is_valid():
             try:
-                services.create_topic_with_sides(
-                    request.user, form, side_names
-                )
+                services.create_topic_with_sides(request.user, form, side_names)
             except ValidationError as err:
                 form.add_error(None, err)
             else:
@@ -150,9 +148,7 @@ def edit_topic(request, topic_id):
     else:
         form = EditTopicForm(instance=topic)
 
-    return render(
-        request, "debates/edit_topic.html", {"form": form, "topic": topic}
-    )
+    return render(request, "debates/edit_topic.html", {"form": form, "topic": topic})
 
 
 @login_required

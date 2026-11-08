@@ -12,9 +12,7 @@ def create_topic_with_sides(user, form, side_names):
     """สร้างกระทู้พร้อมตัวเลือกฝั่งและ Tag ภายใต้ Transaction เดียวกัน"""
     cleaned_sides = [name.strip() for name in side_names if name.strip()]
     if len(cleaned_sides) < 2:
-        raise ValidationError(
-            "ต้องระบุตัวเลือกสำหรับอภิปรายอย่างน้อย 2 ตัวเลือก"
-        )
+        raise ValidationError("ต้องระบุตัวเลือกสำหรับอภิปรายอย่างน้อย 2 ตัวเลือก")
 
     topic = form.save(commit=False)
     topic.created_by = user
@@ -42,9 +40,7 @@ def submit_vote(user, topic, side_id, comment_text):
     locked_topic = Topic.objects.select_for_update().get(id=topic.id)
 
     if locked_topic.is_expired():
-        raise ValidationError(
-            "ไม่สามารถลงคะแนนได้ เนื่องจากหัวข้อนี้ปิดการโหวตแล้ว"
-        )
+        raise ValidationError("ไม่สามารถลงคะแนนได้ เนื่องจากหัวข้อนี้ปิดการโหวตแล้ว")
 
     if Comment.objects.filter(topic=locked_topic, author=user).exists():
         raise ValidationError("คุณได้ลงคะแนนในหัวข้อนี้ไปแล้ว")
